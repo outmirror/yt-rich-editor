@@ -1,0 +1,29 @@
+{
+  "projectDir": "./",
+  "checker": {
+    "onInvalidReturn": "warn",
+    "onInvalidDestructuring": "error",
+    "onNeedPromiseCheck": "error"
+  },
+  "trigger": {
+    "onReturnLiteral": "warn",
+    "onNoAsyncFn": "error",
+    "onNoAwaitContext": "error"
+  },
+  "i18n": {
+    "onMissingKey": "error",
+    "onKeyBlank": "warn",
+    "onParamError": "warn",
+    "onParamMissing": "error",
+    "onParamRedundant": "warn"
+  },
+  "oakComponent": {
+    "onInvalidEntity": "error",
+    "onInvalidIsList": "error",
+    "onMissingDataAttrs": "warn",
+    "onMissingMethods": "error"
+  },
+  "oakPath": {
+    "onInvalidPath": "error"
+  }
+}
