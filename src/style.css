@@ -10,3 +10,46 @@
   line-height: 1.6;
   transition: border-color 0.2s;
 }
+
+/* 公共基础样式（所有 tool-btn 共有） */
+.tool-btn {
+    width: 32px;
+    height: 32px;
+    
+    /* 2. 使用 Flex 让内容绝对居中 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* 3. 必须重置内边距，否则宽高会被撑大 */
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* 加粗样式（单独类） */
+.tool-btn-bold {
+    font-weight: 700;
+}
+
+/* 斜体样式（单独类） */
+.tool-btn-italic {
+    font-style: italic;
+}
+
+/* 公共禁用样式（可通过 disabled 属性或类） */
+.tool-btn:disabled {
+    background-color: #ddd;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+button:active {
+box-shadow: 0 0 0 1px var(--primary-color);
+opacity: 0;
+}
