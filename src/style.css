@@ -53,3 +53,19 @@ button:active {
 box-shadow: 0 0 0 1px var(--primary-color);
 opacity: 0;
 }
+
+/* 加粗按钮激活（全部加粗） */
+.tool-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+    box-shadow: 0 0 0 1px #007bff;
+}
+
+/* 加粗按钮混合状态（部分加粗） */
+.tool-btn.mixed {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    box-shadow: 0 0 0 1px #ffc107;
+    color: #333;
+}

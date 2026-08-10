@@ -55,3 +55,178 @@ export const splitSelectionText = (selectionText: Selection | null) => {
     strong.appendChild(middlePart);           // 将 middlePart 移动到 strong 内部
 
 }
+
+export const bold = (selection: Selection | null): boolean => {
+    if (!selection || selection.rangeCount === 0) return false;
+
+    try {
+        // 直接调用浏览器内置的加粗切换命令
+        document.execCommand('bold', false, '');
+        return true;
+    } catch (error) {
+        console.warn('execCommand bold 失败:', error);
+        return false;
+    }
+};
+
+// export const getBoldState = (selection: Selection | null): boolean | 'mixed' | null => {
+//     if (!selection || selection.rangeCount === 0) return null;
+
+//     const range = selection.getRangeAt(0);
+//     // 获取选区内的所有文本节点
+//     const walker = document.createTreeWalker(
+//         range.commonAncestorContainer,
+//         NodeFilter.SHOW_TEXT,
+//         {
+//             acceptNode: (node) => {
+//                 // 只选择在选区范围内的文本节点
+//                 if (range.intersectsNode(node)) {
+//                     return NodeFilter.FILTER_ACCEPT;
+//                 }
+//                 return NodeFilter.FILTER_REJECT;
+//             }
+//         }
+//     );
+
+//     console.log('walker', walker);
+
+//     let hasBold = false;
+//     let hasNotBold = false;
+//     let node: Node | null;
+//     while ((node = walker.nextNode())) {
+//         // 向上查找最近的 strong/b 标签
+//         let parent = node.parentNode;
+//         let isBold = false;
+//         while (parent && parent !== range.commonAncestorContainer) {
+//             if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') {
+//                 isBold = true;
+//                 break;
+//             }
+//             parent = parent.parentNode;
+//         }
+//         if (isBold) hasBold = true;
+//         else hasNotBold = true;
+//         // 如果两种状态都已出现，提前返回 'mixed'
+//         if (hasBold && hasNotBold) return 'mixed';
+//     }
+
+//     if (hasBold && !hasNotBold) return true;
+//     if (!hasBold && hasNotBold) return false;
+//     // 没有文本节点（空选区）视为 null
+//     return null;
+// };
+
+export const getBoldState = (selection: Selection | null): boolean | 'mixed' | null => { 
+    if (!selection || selection.rangeCount === 0) return null;
+    const range = selection.getRangeAt(0);
+
+    // ⭐ 没有选中文字，只有光标
+    if (range.collapsed) {
+        return document.queryCommandState('bold');
+    }
+
+    // ⭐ 处理折叠选区（光标）
+    // if (range.collapsed) {
+    //     let node = range.startContainer;
+    //     // 如果当前节点是文本节点，取其父节点
+    //     if (node.nodeType === Node.TEXT_NODE) {
+    //         node = node.parentNode!;
+    //     }
+    //     // 向上查找加粗标签，直到 editor 容器（避免越界）
+    //     const editor = document.getElementById('editor-container');
+    //     while (node && node !== editor) {
+    //         if (node.nodeName === 'STRONG' || node.nodeName === 'B') {
+    //             return true;
+    //         }
+    //         node = node.parentNode!;
+    //     }
+    //     return false; // 未加粗
+    // }
+
+
+    // 直接这样写会导致，假设ABCDEFG，用户选择了BCDE，那么此时range.commonAncestorContainer就是整个文本节点range123 "BCDE"，而不是B、C、D、E的父节点（不是div），所以需要使用startContainer和endContainer来获取范围内的所有节点
+    // const root = range.commonAncestorContainer
+
+    // console.log(
+    //     "range123",
+    //     range.commonAncestorContainer
+    // )
+
+    const root = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+        ? range.commonAncestorContainer.parentNode!
+        : range.commonAncestorContainer;
+
+    const filter = {
+        acceptNode: function (node: Node) { 
+            if (range.intersectsNode(node)) {
+                return NodeFilter.FILTER_ACCEPT
+            } else { 
+                return NodeFilter.FILTER_REJECT
+            }
+        }
+    }
+
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        filter
+    )
+
+    let hasBold = false;
+    let hasNotBold = false;
+    let node: Node | null;
+    while ((node = walker.nextNode()) !== null)  { 
+        // 这里walker拿到的是文本节点，而不是外面的标签
+        // const node = walker.nextNode()
+
+        let parent = node?.parentNode
+        let isBold = false
+
+        // 这种写法会导致<b>ABC</b>这种情况下，用户选择ABC，由于此时parent就是range.commonAncestorContainer，所以此时不会被标记为加粗
+        // while (parent && parent !== range.commonAncestorContainer) { 
+        //     // 判断是否有加粗
+        //     if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+
+        //     }
+
+        // }
+        
+        if (!parent) { 
+            return null 
+        }
+        
+        if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+            isBold = true
+        }
+        
+        if (!isBold) {
+            while (parent && parent !== range.commonAncestorContainer) { 
+                // 判断是否有加粗
+                if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+                    isBold = true
+                    break
+                }
+                parent = parent.parentNode
+            }
+        }
+
+        if (isBold) {
+            hasBold = true
+        } else { 
+            hasNotBold = true
+        }
+
+        if (hasBold && hasNotBold) { 
+            return 'mixed'
+        }
+    }
+
+    if (hasBold && !hasNotBold) { 
+        return true
+    }
+    if (!hasBold && hasNotBold) { 
+        return false
+    }
+
+    return null
+}
