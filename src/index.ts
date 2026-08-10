@@ -1,4 +1,4 @@
-import { bold, getBoldState, splitSelectionText } from './utils/general';
+import { bold, getBoldState, getItalicState, italic, splitSelectionText } from './utils/general';
 
 const editorContainer = document.getElementById('editor-container') as HTMLDivElement;
 let timer: number;
@@ -71,6 +71,12 @@ const toolBtnListener = () => {
             ctrlAllToolBtn();
         });
     });
+
+    italicBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        italic(state.selectText);
+        console.log('italicBtn clicked');
+    });
 }
 
 const ctrlAllToolBtn = () => {
@@ -80,7 +86,9 @@ const ctrlAllToolBtn = () => {
 
     if (state.selectText && state.isFocused) {
         const boldState = getBoldState(state.selectText);
-        console.log('boldState', boldState)
+        const italicState = getItalicState(state.selectText);
+        // console.log('boldState', boldState)
+        // console.log('italicState', italicState)
         if (boldState === true) {
             boldBtn.classList.add('active');
             boldBtn.classList.remove('mixed');
@@ -90,8 +98,19 @@ const ctrlAllToolBtn = () => {
         } else {
             boldBtn.classList.remove('active', 'mixed');
         }
+
+        if (italicState === true) {
+            italicBtn.classList.add('active');
+            italicBtn.classList.remove('mixed');
+        } else if (italicState === 'mixed') {
+            italicBtn.classList.add('mixed');
+            italicBtn.classList.remove('active');
+        } else {
+            italicBtn.classList.remove('active', 'mixed');
+        }
     } else {
         boldBtn.classList.remove('active', 'mixed');
+        italicBtn.classList.remove('active', 'mixed');
     }
 }
 

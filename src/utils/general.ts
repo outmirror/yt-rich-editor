@@ -69,6 +69,18 @@ export const bold = (selection: Selection | null): boolean => {
     }
 };
 
+export const italic = (selection: Selection | null): boolean => {
+    if (!selection || selection.rangeCount === 0) return false;
+
+    try { 
+        document.execCommand('italic', false, '');
+        return true;
+    } catch (error) {
+        console.warn('execCommand italic 失败:', error);
+        return false;
+    }
+};
+
 // export const getBoldState = (selection: Selection | null): boolean | 'mixed' | null => {
 //     if (!selection || selection.rangeCount === 0) return null;
 
@@ -203,6 +215,82 @@ export const getBoldState = (selection: Selection | null): boolean | 'mixed' | n
             while (parent && parent !== range.commonAncestorContainer) { 
                 // 判断是否有加粗
                 if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+                    isBold = true
+                    break
+                }
+                parent = parent.parentNode
+            }
+        }
+
+        if (isBold) {
+            hasBold = true
+        } else { 
+            hasNotBold = true
+        }
+
+        if (hasBold && hasNotBold) { 
+            return 'mixed'
+        }
+    }
+
+    if (hasBold && !hasNotBold) { 
+        return true
+    }
+    if (!hasBold && hasNotBold) { 
+        return false
+    }
+
+    return null
+}
+
+export const getItalicState = (selection: Selection | null): boolean | 'mixed' | null => { 
+    if (!selection || selection.rangeCount === 0) return null;
+    const range = selection.getRangeAt(0);
+
+    // ⭐ 没有选中文字，只有光标
+    if (range.collapsed) {
+        return document.queryCommandState('italic');
+    }
+
+    const root = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+        ? range.commonAncestorContainer.parentNode!
+        : range.commonAncestorContainer;
+
+    const filter = {
+        acceptNode: function (node: Node) { 
+            if (range.intersectsNode(node)) {
+                return NodeFilter.FILTER_ACCEPT
+            } else { 
+                return NodeFilter.FILTER_REJECT
+            }
+        }
+    }
+
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        filter
+    )
+
+    let hasBold = false;
+    let hasNotBold = false;
+    let node: Node | null;
+    while ((node = walker.nextNode()) !== null)  { 
+        let parent = node?.parentNode
+        let isBold = false
+
+        if (!parent) { 
+            return null 
+        }
+        
+        if (parent.nodeName === 'EM' || parent.nodeName === 'I') { 
+            isBold = true
+        }
+        
+        if (!isBold) {
+            while (parent && parent !== range.commonAncestorContainer) { 
+                // 判断是否有加粗
+                if (parent.nodeName === 'EM' || parent.nodeName === 'I') { 
                     isBold = true
                     break
                 }
