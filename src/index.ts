@@ -1,5 +1,24 @@
 import { bold, getBoldState, getItalicState, italic, splitSelectionText } from './utils/general';
 
+// 1. 工具配置表
+const toolConfig = {
+  bold: {
+    btn: document.getElementById('boldBtn') as HTMLButtonElement,
+    getState: getBoldState,
+  },
+  italic: {
+    btn: document.getElementById('italicBtn') as HTMLButtonElement,
+    getState: getItalicState,
+  },
+  // 后续扩展只需在此添加，例如：
+  // underline: {
+  //   btn: document.getElementById('underlineBtn') as HTMLButtonElement,
+  //   getState: getUnderlineState,
+  // },
+};
+
+
+
 const editorContainer = document.getElementById('editor-container') as HTMLDivElement;
 let timer: number;
 
@@ -75,43 +94,73 @@ const toolBtnListener = () => {
     italicBtn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         italic(state.selectText);
+
+        requestAnimationFrame(() => {
+            ctrlAllToolBtn();
+        });
         console.log('italicBtn clicked');
     });
 }
 
-const ctrlAllToolBtn = () => {
-    toolBtn.forEach(btn => {
-        btn.disabled = !state.isFocused;
-    });
-
-    if (state.selectText && state.isFocused) {
-        const boldState = getBoldState(state.selectText);
-        const italicState = getItalicState(state.selectText);
-        // console.log('boldState', boldState)
-        // console.log('italicState', italicState)
-        if (boldState === true) {
-            boldBtn.classList.add('active');
-            boldBtn.classList.remove('mixed');
-        } else if (boldState === 'mixed') {
-            boldBtn.classList.add('mixed');
-            boldBtn.classList.remove('active');
-        } else {
-            boldBtn.classList.remove('active', 'mixed');
-        }
-
-        if (italicState === true) {
-            italicBtn.classList.add('active');
-            italicBtn.classList.remove('mixed');
-        } else if (italicState === 'mixed') {
-            italicBtn.classList.add('mixed');
-            italicBtn.classList.remove('active');
-        } else {
-            italicBtn.classList.remove('active', 'mixed');
-        }
-    } else {
-        boldBtn.classList.remove('active', 'mixed');
-        italicBtn.classList.remove('active', 'mixed');
+const updateToolState = (
+  btn: HTMLButtonElement,
+  state: boolean | 'mixed' | null
+) => {
+    btn.classList.remove('active', 'mixed');
+    if (state === true) {
+        btn.classList.add('active');
+    } else if (state === 'mixed') {
+        btn.classList.add('mixed');
     }
+};
+
+// const ctrlAllToolBtn = () => {
+//     toolBtn.forEach(btn => {
+//         btn.disabled = !state.isFocused;
+//     });
+
+//     if (state.selectText && state.isFocused) {
+//         const boldState = getBoldState(state.selectText);
+//         const italicState = getItalicState(state.selectText);
+//         // console.log('boldState', boldState)
+//         // console.log('italicState', italicState)
+//         if (boldState === true) {
+//             boldBtn.classList.add('active');
+//             boldBtn.classList.remove('mixed');
+//         } else if (boldState === 'mixed') {
+//             boldBtn.classList.add('mixed');
+//             boldBtn.classList.remove('active');
+//         } else {
+//             boldBtn.classList.remove('active', 'mixed');
+//         }
+
+//         if (italicState === true) {
+//             italicBtn.classList.add('active');
+//             italicBtn.classList.remove('mixed');
+//         } else if (italicState === 'mixed') {
+//             italicBtn.classList.add('mixed');
+//             italicBtn.classList.remove('active');
+//         } else {
+//             italicBtn.classList.remove('active', 'mixed');
+//         }
+//     } else {
+//         boldBtn.classList.remove('active', 'mixed');
+//         italicBtn.classList.remove('active', 'mixed');
+//     }
+// }
+
+const ctrlAllToolBtn = () => {
+    const disabled = !state.isFocused;
+    Object.values(toolConfig).forEach((tool) => {
+        tool.btn.disabled = disabled;
+
+        if (state.selectText && state.isFocused) {
+            const toolState = tool.getState(state.selectText);
+            updateToolState(tool.btn, toolState);
+        } else {
+            updateToolState(tool.btn, null);
+        }
+    })
 }
 
 const addListeners = () => {
