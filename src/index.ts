@@ -76,6 +76,7 @@ const isSelectTextInContainer = () => {
     state.selectRange = range || null;
     const container = range?.commonAncestorContainer as HTMLElement;
     console.log('range', range)
+    console.log('container', container)
     return editorContainer.contains(container);
 }
 

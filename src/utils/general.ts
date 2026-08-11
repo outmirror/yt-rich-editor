@@ -35,7 +35,7 @@ export const splitSelectionText = (selectionText: Selection | null) => {
 
     if (!parent) return null;
 
-        // 判断是否已在 <strong> 内
+    // 判断是否已在 <strong> 内
     if (parent.nodeName === 'STRONG') {
         // 取消加粗：将整个 <strong> 替换为纯文本节点
         const strong = parent as HTMLElement;
@@ -72,7 +72,7 @@ export const bold = (selection: Selection | null): boolean => {
 export const italic = (selection: Selection | null): boolean => {
     if (!selection || selection.rangeCount === 0) return false;
 
-    try { 
+    try {
         document.execCommand('italic', false, '');
         return true;
     } catch (error) {
@@ -128,7 +128,7 @@ export const italic = (selection: Selection | null): boolean => {
 //     return null;
 // };
 
-export const getBoldState = (selection: Selection | null): boolean | 'mixed' | null => { 
+export const getBoldState = (selection: Selection | null): boolean | 'mixed' | null => {
     if (!selection || selection.rangeCount === 0) return null;
     const range = selection.getRangeAt(0);
 
@@ -168,11 +168,12 @@ export const getBoldState = (selection: Selection | null): boolean | 'mixed' | n
         ? range.commonAncestorContainer.parentNode!
         : range.commonAncestorContainer;
 
+    console.log('root', root)
     const filter = {
-        acceptNode: function (node: Node) { 
+        acceptNode: function (node: Node) {
             if (range.intersectsNode(node)) {
                 return NodeFilter.FILTER_ACCEPT
-            } else { 
+            } else {
                 return NodeFilter.FILTER_REJECT
             }
         }
@@ -187,7 +188,13 @@ export const getBoldState = (selection: Selection | null): boolean | 'mixed' | n
     let hasBold = false;
     let hasNotBold = false;
     let node: Node | null;
-    while ((node = walker.nextNode()) !== null)  { 
+    let time = 1;
+
+    // ⭐ 这里的walker拿到的是文本节点，而不是外面的标签，所以需要向上查找父节点，判断是否有加粗标签
+    // node是最内部的文本节点，所以第一轮的时候node是最内部的
+    while ((node = walker.nextNode()) !== null) {
+        console.log(`第${time}轮`)
+        time += 1
         // 这里walker拿到的是文本节点，而不是外面的标签
         // const node = walker.nextNode()
 
@@ -202,20 +209,41 @@ export const getBoldState = (selection: Selection | null): boolean | 'mixed' | n
         //     }
 
         // }
-        
-        if (!parent) { 
-            return null 
+
+        if (!parent) {
+            return null
         }
-        
-        if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
-            isBold = true
-        }
-        
+
+        console.log('parent', parent)
+        console.log("parentName", parent.nodeName)
+
+        // 这样写的话当第一层是i的时候，那么他下一次内部循环就是parent === range.commonAncestorContainer, 就变成mixed了
+
+        // if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+        //     isBold = true
+        // }
+
+        // if (!isBold) {
+        //     while (parent && parent !== range.commonAncestorContainer) { 
+        //         console.log('while内部parent', parent)
+        //         // 判断是否有加粗
+        //         if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+        //             isBold = true
+        //             break
+        //         }
+        //         parent = parent.parentNode
+        //     }
+        // }
+
         if (!isBold) {
-            while (parent && parent !== range.commonAncestorContainer) { 
+            while (parent) {
+                console.log('while内部parent', parent)
                 // 判断是否有加粗
-                if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') { 
+                if (parent.nodeName === 'STRONG' || parent.nodeName === 'B') {
                     isBold = true
+                    break
+                }
+                if (parent === range.commonAncestorContainer) {
                     break
                 }
                 parent = parent.parentNode
@@ -224,26 +252,26 @@ export const getBoldState = (selection: Selection | null): boolean | 'mixed' | n
 
         if (isBold) {
             hasBold = true
-        } else { 
+        } else {
             hasNotBold = true
         }
 
-        if (hasBold && hasNotBold) { 
+        if (hasBold && hasNotBold) {
             return 'mixed'
         }
     }
 
-    if (hasBold && !hasNotBold) { 
+    if (hasBold && !hasNotBold) {
         return true
     }
-    if (!hasBold && hasNotBold) { 
+    if (!hasBold && hasNotBold) {
         return false
     }
 
     return null
 }
 
-export const getItalicState = (selection: Selection | null): boolean | 'mixed' | null => { 
+export const getItalicState = (selection: Selection | null): boolean | 'mixed' | null => {
     if (!selection || selection.rangeCount === 0) return null;
     const range = selection.getRangeAt(0);
 
@@ -257,10 +285,10 @@ export const getItalicState = (selection: Selection | null): boolean | 'mixed' |
         : range.commonAncestorContainer;
 
     const filter = {
-        acceptNode: function (node: Node) { 
+        acceptNode: function (node: Node) {
             if (range.intersectsNode(node)) {
                 return NodeFilter.FILTER_ACCEPT
-            } else { 
+            } else {
                 return NodeFilter.FILTER_REJECT
             }
         }
@@ -275,23 +303,37 @@ export const getItalicState = (selection: Selection | null): boolean | 'mixed' |
     let hasBold = false;
     let hasNotBold = false;
     let node: Node | null;
-    while ((node = walker.nextNode()) !== null)  { 
+    while ((node = walker.nextNode()) !== null) {
         let parent = node?.parentNode
         let isBold = false
 
-        if (!parent) { 
-            return null 
+        if (!parent) {
+            return null
         }
-        
-        if (parent.nodeName === 'EM' || parent.nodeName === 'I') { 
-            isBold = true
-        }
-        
+
+        // if (parent.nodeName === 'EM' || parent.nodeName === 'I') {
+        //     isBold = true
+        // }
+
+        // if (!isBold) {
+        //     while (parent && parent !== range.commonAncestorContainer) {
+        //         // 判断是否有加粗
+        //         if (parent.nodeName === 'EM' || parent.nodeName === 'I') {
+        //             isBold = true
+        //             break
+        //         }
+        //         parent = parent.parentNode
+        //     }
+        // }
+
         if (!isBold) {
-            while (parent && parent !== range.commonAncestorContainer) { 
+            while (parent) {
                 // 判断是否有加粗
-                if (parent.nodeName === 'EM' || parent.nodeName === 'I') { 
+                if (parent.nodeName === 'EM' || parent.nodeName === 'I') {
                     isBold = true
+                    break
+                }
+                if (parent === range.commonAncestorContainer) {
                     break
                 }
                 parent = parent.parentNode
@@ -300,19 +342,19 @@ export const getItalicState = (selection: Selection | null): boolean | 'mixed' |
 
         if (isBold) {
             hasBold = true
-        } else { 
+        } else {
             hasNotBold = true
         }
 
-        if (hasBold && hasNotBold) { 
+        if (hasBold && hasNotBold) {
             return 'mixed'
         }
     }
 
-    if (hasBold && !hasNotBold) { 
+    if (hasBold && !hasNotBold) {
         return true
     }
-    if (!hasBold && hasNotBold) { 
+    if (!hasBold && hasNotBold) {
         return false
     }
 
