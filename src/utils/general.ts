@@ -366,6 +366,18 @@ export const getItalicState = (selection: Selection | null): boolean | 'mixed' |
     return null
 }
 
+export const toggleStyle  = (selection: Selection | null, style: keyof typeof category): boolean => {
+    if (!selection || selection.rangeCount === 0) return false;
+
+    try {
+        document.execCommand(style, false, '');
+        return true;
+    } catch (error) {
+        console.warn('execCommand italic 失败:', error);
+        return false;
+    }
+};
+
 export const getTextState = (selection: Selection | null, option: keyof typeof category): boolean | "mixed" | null => {
     if (!selection || selection.rangeCount === 0) return null
     const range = selection.getRangeAt(0)

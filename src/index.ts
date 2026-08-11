@@ -1,4 +1,4 @@
-import { bold, getBoldState, getItalicState, italic, splitSelectionText, getTextState, category } from './utils/general';
+import { bold, getBoldState, getItalicState, italic, splitSelectionText, getTextState, category, toggleStyle } from './utils/general';
 
 // 1. 工具配置表
 const toolConfig = {
@@ -83,26 +83,38 @@ const isSelectTextInContainer = () => {
 }
 
 const toolBtnListener = () => {
-    boldBtn.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        bold(state.selectText);
-        // getBoldState(state.selectText);
-        console.log('boldBtn clicked');
+    Object.values(toolConfig).forEach((tool) => {
+        tool.btn.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            toggleStyle(state.selectText, tool.option as keyof typeof category);
 
-        requestAnimationFrame(() => {
-            ctrlAllToolBtn();
-        });
-    });
+            requestAnimationFrame(() => {
+                ctrlAllToolBtn();
+            });
+            console.log('toolBtn clicked');
+        })
+    })
 
-    italicBtn.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        italic(state.selectText);
+    // boldBtn.addEventListener('mousedown', (e) => {
+    //     e.preventDefault();
+    //     bold(state.selectText);
+    //     // getBoldState(state.selectText);
+    //     console.log('boldBtn clicked');
 
-        requestAnimationFrame(() => {
-            ctrlAllToolBtn();
-        });
-        console.log('italicBtn clicked');
-    });
+    //     requestAnimationFrame(() => {
+    //         ctrlAllToolBtn();
+    //     });
+    // });
+
+    // italicBtn.addEventListener('mousedown', (e) => {
+    //     e.preventDefault();
+    //     italic(state.selectText);
+
+    //     requestAnimationFrame(() => {
+    //         ctrlAllToolBtn();
+    //     });
+    //     console.log('italicBtn clicked');
+    // });
 }
 
 const updateToolState = (
