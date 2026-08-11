@@ -13,15 +13,16 @@ const toolConfig = {
         option: "italic"
     },
     // 后续扩展只需在此添加，例如：
-    // underline: {
-    //   btn: document.getElementById('underlineBtn') as HTMLButtonElement,
-    //   getState: getUnderlineState,
-    // },
+    underline: {
+      btn: document.getElementById('underlineBtn') as HTMLButtonElement,
+      getState: getTextState,
+      option: "underline"
+    },
 };
 
 
 
-const editorContainer = document.getElementById('editor-container') as HTMLDivElement;
+export const editorContainer = document.getElementById('editor-container') as HTMLDivElement;
 let timer: number;
 
 const state = {

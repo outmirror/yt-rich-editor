@@ -1,6 +1,8 @@
+import { editorContainer } from './../index';
 export const category = {
     bold: ["STRONG", "B"],
-    italic: ["EM", "I"]
+    italic: ["EM", "I"],
+    underline: ["U", "INS"]
 }
 
 export const splitSelectionText = (selectionText: Selection | null) => {
@@ -373,7 +375,7 @@ export const toggleStyle  = (selection: Selection | null, style: keyof typeof ca
         document.execCommand(style, false, '');
         return true;
     } catch (error) {
-        console.warn('execCommand italic 失败:', error);
+        console.warn(`execCommand ${style} 失败:`, error);
         return false;
     }
 };
@@ -422,7 +424,7 @@ export const getTextState = (selection: Selection | null, option: keyof typeof c
         let parent = node.parentNode
         let isState = false
 
-        while (parent) {
+        while (parent && parent !== editorContainer) {
             if (!parent) {
                 return null
             }
@@ -435,9 +437,9 @@ export const getTextState = (selection: Selection | null, option: keyof typeof c
             // 这样不会阻止向上查询，但是使用parent ===root会
             console.log("root", root)
             console.log("commonAncestorContainer", range.commonAncestorContainer)
-            if (parent === range.commonAncestorContainer) {
-                break
-            }
+            // if (parent === range.commonAncestorContainer) {
+            //     break
+            // }
 
             parent = parent.parentNode
         }

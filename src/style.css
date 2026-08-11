@@ -41,6 +41,11 @@
     font-style: italic;
 }
 
+/* 下划线样式（单独类） */
+.tool-btn-underline {
+    text-decoration: underline;
+}
+
 /* 公共禁用样式（可通过 disabled 属性或类） */
 .tool-btn:disabled {
     background-color: #ddd;
