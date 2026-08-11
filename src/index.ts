@@ -1,20 +1,22 @@
-import { bold, getBoldState, getItalicState, italic, splitSelectionText } from './utils/general';
+import { bold, getBoldState, getItalicState, italic, splitSelectionText, getTextState, category } from './utils/general';
 
 // 1. 工具配置表
 const toolConfig = {
-  bold: {
-    btn: document.getElementById('boldBtn') as HTMLButtonElement,
-    getState: getBoldState,
-  },
-  italic: {
-    btn: document.getElementById('italicBtn') as HTMLButtonElement,
-    getState: getItalicState,
-  },
-  // 后续扩展只需在此添加，例如：
-  // underline: {
-  //   btn: document.getElementById('underlineBtn') as HTMLButtonElement,
-  //   getState: getUnderlineState,
-  // },
+    bold: {
+        btn: document.getElementById('boldBtn') as HTMLButtonElement,
+        getState: getTextState,
+        option: "bold"
+    },
+    italic: {
+        btn: document.getElementById('italicBtn') as HTMLButtonElement,
+        getState: getTextState,
+        option: "italic"
+    },
+    // 后续扩展只需在此添加，例如：
+    // underline: {
+    //   btn: document.getElementById('underlineBtn') as HTMLButtonElement,
+    //   getState: getUnderlineState,
+    // },
 };
 
 
@@ -104,8 +106,8 @@ const toolBtnListener = () => {
 }
 
 const updateToolState = (
-  btn: HTMLButtonElement,
-  state: boolean | 'mixed' | null
+    btn: HTMLButtonElement,
+    state: boolean | 'mixed' | null
 ) => {
     btn.classList.remove('active', 'mixed');
     if (state === true) {
@@ -156,7 +158,7 @@ const ctrlAllToolBtn = () => {
         tool.btn.disabled = disabled;
 
         if (state.selectText && state.isFocused) {
-            const toolState = tool.getState(state.selectText);
+            const toolState = tool.getState(state.selectText, tool.option as keyof typeof category);
             updateToolState(tool.btn, toolState);
         } else {
             updateToolState(tool.btn, null);

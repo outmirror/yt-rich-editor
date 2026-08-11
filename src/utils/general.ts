@@ -1,3 +1,8 @@
+export const category = {
+    bold: ["STRONG", "B"],
+    italic: ["EM", "I"]
+}
+
 export const splitSelectionText = (selectionText: Selection | null) => {
     if (!selectionText) return null;
     if (selectionText.rangeCount === 0) return null;
@@ -355,6 +360,90 @@ export const getItalicState = (selection: Selection | null): boolean | 'mixed' |
         return true
     }
     if (!hasBold && hasNotBold) {
+        return false
+    }
+
+    return null
+}
+
+export const getTextState = (selection: Selection | null, option: keyof typeof category): boolean | "mixed" | null => {
+    if (!selection || selection.rangeCount === 0) return null
+    const range = selection.getRangeAt(0)
+    if (range.collapsed) {
+        return document.queryCommandState(option)
+    }
+
+    const filter = {
+        acceptNode: function (node: Node) {
+            if (range.intersectsNode(node)) {
+                return NodeFilter.FILTER_ACCEPT
+            } else {
+                return NodeFilter.FILTER_REJECT
+            }
+        }
+    }
+
+    // ⚠️ 问题
+    // TreeWalker 的 root 必须是容器节点（元素或文档），虽然可以传文本节点，但：
+
+    // 如果 root 是文本节点，walker 只会遍历这个文本节点本身（因为文本节点没有子节点），而无法访问到选区可能涉及的其他文本节点（例如跨多个标签的选区）。
+
+    // 如果选区跨多个文本节点（如 <b>AB</b><i>CD</i> 中选中 "ABCD"），commonAncestorContainer 可能是 <body> 或某个块级元素，但若恰巧 commonAncestorContainer 是文本节点（比如选区只在一个文本节点内），walker 只扫描这一个节点，其他文本节点的样式就会被遗漏，导致 hasState / hasNotState 统计不全，最终返回错误结果。
+
+    // ✅ 正确做法
+    // 必须将 root 规范化为一个元素节点（即文本节点的父节点），确保 walker 能覆盖选区所在的所有可能节点。
+    // const root = range.commonAncestorContainer
+    const root = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+        ? range.commonAncestorContainer.parentNode!
+        : range.commonAncestorContainer;
+    const walker = document.createTreeWalker(
+        root,
+        NodeFilter.SHOW_TEXT,
+        filter,
+    )
+
+    let node: Node | null
+    let hasNotState: boolean = false
+    let hasState: boolean = false
+
+    while ((node = walker.nextNode()) !== null) {
+        let parent = node.parentNode
+        let isState = false
+
+        while (parent) {
+            if (!parent) {
+                return null
+            }
+
+            if (category[option].includes(parent.nodeName)) {
+                isState = true
+                break
+            }
+
+            // 这样不会阻止向上查询，但是使用parent ===root会
+            console.log("root", root)
+            console.log("commonAncestorContainer", range.commonAncestorContainer)
+            if (parent === range.commonAncestorContainer) {
+                break
+            }
+
+            parent = parent.parentNode
+        }
+
+        if (isState) {
+            hasState = true
+        } else {
+            hasNotState = true
+        }
+
+        if (hasNotState && hasState) {
+            return 'mixed'
+        }
+    }
+
+    if (!hasNotState && hasState) {
+        return true
+    } else if (!hasState && hasNotState) {
         return false
     }
 
