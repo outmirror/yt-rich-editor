@@ -2,7 +2,8 @@ import { editorContainer } from './../index';
 export const category = {
     bold: ["STRONG", "B"],
     italic: ["EM", "I"],
-    underline: ["U", "INS"]
+    underline: ["U", "INS"],
+    strikeThrough: ["S", "STRIKE"]
 }
 
 export const splitSelectionText = (selectionText: Selection | null) => {

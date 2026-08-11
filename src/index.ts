@@ -18,6 +18,11 @@ const toolConfig = {
       getState: getTextState,
       option: "underline"
     },
+    strikeThrough: {
+      btn: document.getElementById('strikeBtn') as HTMLButtonElement,
+      getState: getTextState,
+      option: "strikeThrough"
+    }
 };
 
 

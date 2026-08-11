@@ -46,6 +46,11 @@
     text-decoration: underline;
 }
 
+/* 删除线样式（单独类） */
+.tool-btn-strike {
+    text-decoration: line-through;
+}
+
 /* 公共禁用样式（可通过 disabled 属性或类） */
 .tool-btn:disabled {
     background-color: #ddd;
