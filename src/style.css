@@ -1,81 +1,186 @@
+/* ========== 全局重置 & 基础 ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #f0f4f9;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  margin: 0;
+}
+
+/* ========== 应用卡片 ========== */
+#app {
+  max-width: 820px;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px -12px rgba(0, 20, 40, 0.12), 0 8px 32px -8px rgba(0, 0, 0, 0.06);
+  padding: 1.75rem 1.75rem 2rem;
+  transition: box-shadow 0.25s ease;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem 0.5rem;
+}
+
+/* ========== 编辑器容器（占一整行） ========== */
 #editor-container {
-  background: #fff;
-  border: 1px solid #d0d7de;
-  border-radius: 8px;
-  padding: 1rem;
+  flex: 0 0 100%;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
   min-height: 200px;
-  margin: 1rem 0;
+  max-height: 420px;
+  overflow-y: auto;
   outline: none;
   font-size: 16px;
-  line-height: 1.6;
-  transition: border-color 0.2s;
+  line-height: 1.75;
+  color: #0b1a33;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  caret-color: #2563eb;
+  font-family: inherit;
+  scroll-behavior: smooth;
 }
 
-/* 公共基础样式（所有 tool-btn 共有） */
+#editor-container:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+#editor-container:not(:focus):hover {
+  border-color: #cbd5e1;
+}
+
+/* 编辑器占位符效果（可选，仅当内容为空时显示） */
+#editor-container:empty::before {
+  content: "开始输入…";
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+/* ========== 工具栏按钮（所有工具按钮） ========== */
 .tool-btn {
-    width: 32px;
-    height: 32px;
-    
-    /* 2. 使用 Flex 让内容绝对居中 */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    
-    /* 3. 必须重置内边距，否则宽高会被撑大 */
-    padding: 0;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #334155;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  font-family: inherit;
+  flex-shrink: 0;
 }
 
-/* 加粗样式（单独类） */
+/* 每个按钮专属字体样式（保持原有类） */
 .tool-btn-bold {
-    font-weight: 700;
+  font-weight: 700;
 }
-
-/* 斜体样式（单独类） */
 .tool-btn-italic {
-    font-style: italic;
+  font-style: italic;
 }
-
-/* 下划线样式（单独类） */
 .tool-btn-underline {
-    text-decoration: underline;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
-
-/* 删除线样式（单独类） */
 .tool-btn-strike {
-    text-decoration: line-through;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
 }
 
-/* 公共禁用样式（可通过 disabled 属性或类） */
+/* 悬停效果（非禁用） */
+.tool-btn:not(:disabled):hover {
+  background: #eef2f6;
+  color: #0f172a;
+  transform: translateY(-1px);
+}
+
+/* 按下效果（非禁用） */
+.tool-btn:not(:disabled):active {
+  transform: scale(0.92);
+  background: #dce3ec;
+}
+
+/* 禁用状态 */
 .tool-btn:disabled {
-    background-color: #ddd;
-    color: #999;
-    cursor: not-allowed;
-    opacity: 0.7;
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: grayscale(0.4);
 }
 
-button:active {
-box-shadow: 0 0 0 1px var(--primary-color);
-opacity: 0;
-}
-
-/* 加粗按钮激活（全部加粗） */
+/* ---------- 激活状态（全部应用） ---------- */
 .tool-btn.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-    box-shadow: 0 0 0 1px #007bff;
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.35);
+}
+.tool-btn.active:not(:disabled):hover {
+  background: #1d4ed8;
+  box-shadow: 0 6px 16px -3px rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
+}
+.tool-btn.active:not(:disabled):active {
+  transform: scale(0.92);
+  background: #1e40af;
 }
 
-/* 加粗按钮混合状态（部分加粗） */
+/* ---------- 混合状态（部分应用） ---------- */
 .tool-btn.mixed {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    box-shadow: 0 0 0 1px #ffc107;
-    color: #333;
+  background: #f59e0b;
+  color: #1e293b;
+  box-shadow: 0 4px 12px -2px rgba(245, 158, 11, 0.3);
 }
+.tool-btn.mixed:not(:disabled):hover {
+  background: #d97706;
+  box-shadow: 0 6px 16px -3px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+.tool-btn.mixed:not(:disabled):active {
+  transform: scale(0.92);
+  background: #b45309;
+}
+
+/* ========== 分隔线（视觉上分隔工具组） ========== */
+/* 为保持原有结构，我们利用按钮之间的间距和第一个按钮前的 margin */
+.tool-btn:first-of-type {
+  margin-left: 0;
+}
+/* 在按钮之间加一点间距，靠 flex gap 实现，已在 #app 上设置 gap */
+
+/* ========== 输出框（pre） ========== */
+#output {
+  flex: 0 0 100%;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e9edf2;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1e293b;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 120px;
+  overflow-y: auto;
+  display: none; /* 默认隐藏，如需显示可改为 block */
+}
+
+/* 如果希望显示 output，可将上面的 display 改为 block，或保留隐藏 */
