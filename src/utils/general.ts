@@ -3,7 +3,9 @@ export const category = {
     bold: ["STRONG", "B"],
     italic: ["EM", "I"],
     underline: ["U", "INS"],
-    strikeThrough: ["S", "STRIKE"]
+    strikeThrough: ["S", "STRIKE"],
+    subscript: ["SUB"],          // 新增
+    superscript: ["SUP"]         // 新增
 }
 
 export const splitSelectionText = (selectionText: Selection | null) => {
@@ -369,7 +371,7 @@ export const getItalicState = (selection: Selection | null): boolean | 'mixed' |
     return null
 }
 
-export const toggleStyle  = (selection: Selection | null, style: keyof typeof category): boolean => {
+export const toggleStyle = (selection: Selection | null, style: keyof typeof category): boolean => {
     if (!selection || selection.rangeCount === 0) return false;
 
     try {

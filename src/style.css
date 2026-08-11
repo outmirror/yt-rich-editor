@@ -103,6 +103,16 @@ body {
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
 }
+.tool-btn-sub {
+    font-size: 14px;
+    vertical-align: sub;
+    line-height: 1;
+}
+.tool-btn-sup {
+    font-size: 14px;
+    vertical-align: super;
+    line-height: 1;
+}
 
 /* 悬停效果（非禁用） */
 .tool-btn:not(:disabled):hover {

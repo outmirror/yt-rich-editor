@@ -14,14 +14,24 @@ const toolConfig = {
     },
     // 后续扩展只需在此添加，例如：
     underline: {
-      btn: document.getElementById('underlineBtn') as HTMLButtonElement,
-      getState: getTextState,
-      option: "underline"
+        btn: document.getElementById('underlineBtn') as HTMLButtonElement,
+        getState: getTextState,
+        option: "underline"
     },
     strikeThrough: {
-      btn: document.getElementById('strikeBtn') as HTMLButtonElement,
-      getState: getTextState,
-      option: "strikeThrough"
+        btn: document.getElementById('strikeBtn') as HTMLButtonElement,
+        getState: getTextState,
+        option: "strikeThrough"
+    },
+    subscript: {
+        btn: document.getElementById('subscriptBtn') as HTMLButtonElement,
+        getState: getTextState,
+        option: "subscript"
+    },
+    superscript: {
+        btn: document.getElementById('superscriptBtn') as HTMLButtonElement,
+        getState: getTextState,
+        option: "superscript"
     }
 };
 
